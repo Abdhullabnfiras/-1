@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>منيو ذكي سوبر جكن - Slider محسّن</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Alexandria&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.2/css/all.min.css" />
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Alexandria', sans-serif;
+            background-color: whitesmoke;
+            background-image:
+                linear-gradient(to right, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        .top-slide {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 55%;
+            max-width: 500px;
+            height: 50px;
+            background-color: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-direction: row-reverse;
+            border-radius: 15px;
+            z-index: 10;
+        }
+
+        .top-slide h1 {
+            font-size: 17px;
+        }
+
+        .top-slide img {
+            height: 44px;
+        }
+
+        .slider-bg {
+            position: absolute;
+            top: 120px;
+            left: 0;
+            width: 100%;
+            height: 200px;
+            background-color: #e74c3c;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            z-index: 1;
+        }
+
+        .ticker {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 44px;
+            background: #c62828;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .ticker-inner {
+            display: inline-block;
+            white-space: nowrap;
+            padding-inline: 20px;
+            font-weight: 700;
+            letter-spacing: .2px;
+        }
+
+        .slider {
+            position: relative;
+            display: flex;
+            gap: 20px;
+            padding: 10px 20px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            z-index: 2;
+        }
+
+        .slider::-webkit-scrollbar {
+            display: none;
+        }
+
+        .slider-item {
+            background-color: white;
+            width: 95px;
+            /* أصغر من السابق */
+            min-width: 50px;
+            height: 130px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            scroll-snap-align: center;
+            border-radius: 12px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+            padding: 8px 5px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+        }
+
+        .slider-item img {
+            width: 90px;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 5px;
+        }
+
+        .slider-item span {
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            text-align: center;
+        }
+
+        @media(max-width: 768px) {
+            .slider-item {
+                min-width: 38%;
+                height: auto;
+            }
+
+            .slider-item img {
+                width: 120px;
+                height: 120px;
+            }
+        }
+
+        /* Menu section */
+        .menu-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 24px auto 60px;
+            /* أسفل الهيدر والسلايدر الثابت */
+            padding: 0 16px;
+        }
+
+        .menu-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .menu-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .menu-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .menu-card {
+            display: flex;
+            gap: 12px;
+            background: #fff;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            align-items: center;
+            opacity: 0;
+            transform: translateY(8px);
+            will-change: opacity, transform;
+        }
+
+        .menu-image {
+            width: 90px;
+            height: 90px;
+            border-radius: 10px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .menu-content {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .menu-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #222;
+        }
+
+        .menu-desc {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+        }
+
+        .menu-price {
+            margin-top: 2px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        .slider-item.active {
+            outline: 2px solid #fff;
+            box-shadow: 0 0 0 2px #e74c3c inset, 0 3px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        /* spacing under fixed header + slider */
+        main {
+            padding-top: 340px;
+        }
+
+        /* reveal animation */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .reveal.show,
+        .menu-card.show {
+            opacity: 1;
+            transform: translateY(0);
+            transition: opacity .75s cubic-bezier(.22, 1, .36, 1), transform .75s cubic-bezier(.22, 1, .36, 1);
+            transition-delay: var(--delay, 0s);
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .menu-card,
+            .reveal {
+                transition: none !important;
+                transform: none !important;
+                opacity: 1 !important;
+            }
+        }
+
+        /* Preferences (Offers, Suggested, Best Sellers) */
+        .prefs {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 0;
+            padding: 0 16px;
+        }
+
+        .prefs+.menu-container {
+            margin-top: 24px;
+        }
+
+        .prefs-section {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+            padding: 12px;
+            margin-bottom: 14px;
+        }
+
+        /* Branding highlights */
+        .brand-highlights {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto 14px;
+            padding: 0;
+        }
+
+        .brand-title {
+            font-size: 18px;
+            font-weight: 900;
+            color: #111;
+            margin-bottom: 10px;
+        }
+
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .brand-card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .06);
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #eee;
+            font-size: 13px;
+            font-weight: 800;
+            color: #222;
+        }
+
+        .brand-icon {
+            width: 28px;
+            height: 28px;
+            margin: 0 auto 6px;
+            display: block;
+            color: #e74c3c;
+        }
+
+        .brand-icon i {
+            font-size: 24px;
+            color: #e74c3c;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        @media (max-width: 600px) {
+            .brand-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .prefs-main-title {
+            font-size: 20px;
+            font-weight: 900;
+            color: #111;
+            margin-bottom: 10px;
+        }
+
+        .prefs-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .prefs-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #222;
+        }
+
+        /* Large offer cards */
+        .offers-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .offer-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            min-height: 120px;
+            background: #fafafa;
+            display: flex;
+            align-items: stretch;
+            isolation: isolate;
+        }
+
+        .offer-media {
+            width: 45%;
+            object-fit: cover;
+        }
+
+        .offer-body {
+            flex: 1;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .offer-badge {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #e74c3c;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+            z-index: 1;
+        }
+
+        .offer-title {
+            font-weight: 800;
+            font-size: 14px;
+            color: #1d1d1f;
+        }
+
+        .offer-desc {
+            font-size: 12px;
+            color: #555;
+        }
+
+        .offer-cta {
+            align-self: flex-start;
+            margin-top: 6px;
+            background: #1d1d1f;
+            color: #fff;
+            border: 0;
+            padding: 6px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        /* Suggested products strip */
+        .suggest-strip {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 4px;
+        }
+
+        .suggest-card {
+            min-width: 180px;
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, .04);
+        }
+
+        .suggest-media {
+            width: 100%;
+            height: 90px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .suggest-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .suggest-price {
+            font-size: 13px;
+            color: #e74c3c;
+            font-weight: 800;
+        }
+
+        .suggest-cta {
+            width: 100%;
+            margin-top: 6px;
+            background: #e74c3c;
+            color: #fff;
+            border: 0;
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        /* Best sellers - large cards */
+        .best-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .best-card {
+            background: #fff;
+            border-radius: 14px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, .08);
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            border: 1px solid #eee;
+        }
+
+        .best-media {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .best-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .best-name {
+            font-weight: 800;
+            color: #222;
+            font-size: 14px;
+        }
+
+        .best-badge {
+            background: #16a34a;
+            color: #fff;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .best-price {
+            color: #e74c3c;
+            font-weight: 800;
+            font-size: 13px;
+        }
+
+        .best-cta {
+            background: #e74c3c;
+            color: #fff;
+            border: 0;
+            padding: 8px 10px;
+            border-radius: 10px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 540px) {
+            .offers-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .best-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-slide">
+        <h1>سوبر جكـن</h1>
+        <img src="../img/بخو.png" alt="logo">
+    </div>
+
+    <div class="slider-bg">
+        <div class="ticker" aria-live="polite">
+            <div class="ticker-inner" id="news-text"></div>
+        </div>
+        <div class="slider">
+            <button type="button" class="slider-item" data-category="العروض"><img src="../img/download (3).jpg"
+                    alt="العروض"><span>العروض</span></button>
+            <button type="button" class="slider-item" data-category="وجبات كنتاكي"><img src="../img/download (3).jpg"
+                    alt="وجبات كنتاكي"><span>كنتاكي</span></button>
+            <button type="button" class="slider-item" data-category="ستربس"><img src="../img/download (3).jpg"
+                    alt="ستربس"><span>ستربس</span></button>
+            <button type="button" class="slider-item" data-category="بيتزا"><img src="../img/download (2).jpg"
+                    alt="بيتزا"><span>بيتزا</span></button>
+            <button type="button" class="slider-item" data-category="الصاج"><img src="../img/شاورما.jpg"
+                    alt="الصاج"><span>الصاج</span></button>
+            <button type="button" class="slider-item" data-category="سندويتش"><img src="../img/شاورما.jpg"
+                    alt="سندويتش"><span>سندويتش</span></button>
+            <button type="button" class="slider-item" data-category="تويستر"><img src="../img/شاورما.jpg"
+                    alt="تويستر"><span>تويستر</span></button>
+            <button type="button" class="slider-item" data-category="ريزو"><img src="../img/🤍🤍.jpg"
+                    alt="ريزو"><span>ريزو</span></button>
+            <button type="button" class="slider-item" data-category="اطباق جانبية"><img src="../img/لعشق ☘️.jpg"
+                    alt="اطباق جانبية"><span>جانبية</span></button>
+            <button type="button" class="slider-item" data-category="مشروبات"><img src="../img/Coca Cola.jpg"
+                    alt="مشروبات"><span>مشروبات</span></button>
+        </div>
+    </div>
+
+    <main>
+        <!-- تفضيلات: عروض كبيرة + مقترحات بطلب الآن + الأكثر بيعاً -->
+        <section class="prefs" aria-label="تفضيلاتك" id="offers-section">
+            <section class="brand-highlights" aria-label="خبراء الطعم">
+                <div class="brand-title">خبراء الطعم — خليك سوبر!</div>
+                <div class="brand-grid">
+                    <div class="brand-card"><span class="brand-icon"><i class="fa-solid fas fa-star"
+                                aria-hidden="true"></i></span>نكهة مميزة</div>
+                    <div class="brand-card"><span class="brand-icon"><i class="fa-solid fas fa-truck-fast"
+                                aria-hidden="true"></i></span>توصيل سريع</div>
+                    <div class="brand-card"><span class="brand-icon"><i class="fa-solid fas fa-gem"></i></span>جودة
+                        عالية</div>
+                    <div class="brand-card"><span class="brand-icon"><i
+                                class="fa-solid fas fa-thumbs-up"></i></span>خدمة ممتازة
+                    </div>
+                </div>
+            </section>
+            <div class="prefs-main-title">العروض</div>
+            <div class="prefs-section">
+                <div class="prefs-header">
+                    <div class="prefs-title">عروض مختارة لك</div>
+                </div>
+                <div class="offers-grid">
+                    <article class="offer-card reveal">
+                        <span class="offer-badge">عرض حصري</span>
+                        <img class="offer-media" src="../img/download (3).jpg" alt="Bucket Offer">
+                        <div class="offer-body">
+                            <div>
+                                <div class="offer-title">باكت العيلة + 2 بيبسي</div>
+                                <div class="offer-desc">10 قطع دجاج + بطاطا + صوصات</div>
+                                <div class="offer-desc" style="font-weight:800;color:#e74c3c">ابتداءً من 9000 د.ع</div>
+                            </div>
+                            <button class="offer-cta" data-go="وجبات كنتاكي">اطلب العرض</button>
+                        </div>
+                    </article>
+                    <article class="offer-card reveal">
+                        <span class="offer-badge">وفر 15%</span>
+                        <img class="offer-media" src="../img/🤍🤍.jpg" alt="Rizo Combo">
+                        <div class="offer-body">
+                            <div>
+                                <div class="offer-title">كومبو ريزو سبايسي</div>
+                                <div class="offer-desc">ريزو + مشروب</div>
+                                <div class="offer-desc" style="font-weight:800;color:#e74c3c">ابتداءً من 6000 د.ع</div>
+                            </div>
+                            <button class="offer-cta" data-go="ريزو">اطلب العرض</button>
+                        </div>
+                    </article>
+                </div>
+            </div>
+
+            <div class="prefs-section">
+                <div class="prefs-header">
+                    <div class="prefs-title">مقترحات سريعة</div>
+                </div>
+                <div class="suggest-strip">
+                    <div class="suggest-card reveal">
+                        <img class="suggest-media" src="../img/شاورما.jpg" alt="تويستر">
+                        <div class="suggest-name">تويستر مدخن</div>
+                        <div class="suggest-price">6500 د.ع</div>
+                        <button class="suggest-cta" data-go="تويستر">اطلبها الآن</button>
+                    </div>
+                    <div class="suggest-card reveal">
+                        <img class="suggest-media" src="../img/download (2).jpg" alt="بيتزا">
+                        <div class="suggest-name">بيتزا باريبيكو</div>
+                        <div class="suggest-price">8000 د.ع</div>
+                        <button class="suggest-cta" data-go="بيتزا">اطلبها الآن</button>
+                    </div>
+                    <div class="suggest-card reveal">
+                        <img class="suggest-media" src="../img/لعشق ☘️.jpg" alt="جانبية">
+                        <div class="suggest-name">أصابع جبن</div>
+                        <div class="suggest-price">4000 د.ع</div>
+                        <button class="suggest-cta" data-go="اطباق جانبية">اطلبها الآن</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="prefs-section">
+                <div class="prefs-header">
+                    <div class="prefs-title">الأكثر بيعاً</div>
+                </div>
+                <div class="best-row">
+                    <article class="best-card reveal">
+                        <img class="best-media" src="../img/download (3).jpg" alt="سوبر كنتاكي">
+                        <div class="best-top">
+                            <div class="best-name">سوبر كنتاكي</div>
+                            <span class="best-badge">ممتاز</span>
+                        </div>
+                        <div class="best-price">ابتداءً من 9000 د.ع</div>
+                        <button class="best-cta" data-go="وجبات كنتاكي">اطلب الآن</button>
+                    </article>
+                    <article class="best-card reveal">
+                        <img class="best-media" src="../img/شاورما.jpg" alt="ساندويش فلر">
+                        <div class="best-top">
+                            <div class="best-name">ساندويش فلر</div>
+                            <span class="best-badge">ممتاز</span>
+                        </div>
+                        <div class="best-price">ابتداءً من 6500 د.ع</div>
+                        <button class="best-cta" data-go="سندويتش">اطلب الآن</button>
+                    </article>
+                    <article class="best-card reveal">
+                        <img class="best-media" src="../img/🤍🤍.jpg" alt="ريزو سوبر">
+                        <div class="best-top">
+                            <div class="best-name">ريزو سوبر</div>
+                            <span class="best-badge">ممتاز</span>
+                        </div>
+                        <div class="best-price">ابتداءً من 6000 د.ع</div>
+                        <button class="best-cta" data-go="ريزو">اطلب الآن</button>
+                    </article>
+                </div>
+            </div>
+        </section>
+        <section class="menu-container" aria-label="قائمة الأصناف" id="menu-section">
+            <div class="menu-header">
+                <div class="menu-title" id="menu-title">—</div>
+            </div>
+            <div class="menu-list" id="menu-list"></div>
+        </section>
+    </main>
+
+    <script>
+        (function () {
+            const categoryToItems = {
+                'وجبات كنتاكي': [
+                    { name: 'وجبة أطفال', desc: 'قطعتان دجاج + بطاطا + كول سلو + صوص', price: '6000', img: '../img/download (3).jpg' },
+                    { name: 'وجبة نورمال', desc: '3 قطع دجاج كنتاكي + بطاطا + صوص + كول سلو', price: '9000', img: '../img/download (3).jpg' },
+                    { name: 'وجبة شير', desc: 'وجبتان نورمال + 2 بيبسي', price: '14000', img: '../img/download (3).jpg' },
+                    { name: 'وجبة اكسترا', desc: '6 قطع دجاج + 2 بطاطا + صوصات + كول سلو', price: '19000', img: '../img/download (3).jpg' },
+                    { name: 'وجبة فاميلي', desc: '10 قطع دجاج + 4 خبز + 4 صوص + بطاطا', price: '25000', img: '../img/download (3).jpg' },
+                    { name: 'سوبر كنتاكي', desc: 'باكت مميز بنكهة سوبر جكن', price: '9000', img: '../img/download (3).jpg' }
+                ],
+                'ستربس': [
+                    { name: 'وجبة ستربس', desc: 'قطع فيليه مقرمشة مع الصوص والبطاطا', price: '6500', img: '../img/download (3).jpg' },
+                    { name: 'ستربس مشاركة', desc: 'علبة مشاركة مع صوصات', price: '16000', img: '../img/download (3).jpg' }
+                ],
+                'بيتزا': [
+                    { name: 'بيتزا باربكيو', desc: 'صلصة باربكيو ودجاج', price: '12000', img: '../img/download (2).jpg' },
+                    { name: 'بيتزا ببروني', desc: 'سلامي ببروني', price: '10000', img: '../img/download (2).jpg' },
+                    { name: 'مارغريتا جبن', desc: 'جبن وطماطم وأوريغانو', price: '11000', img: '../img/download (2).jpg' },
+                    { name: 'بيتزا خضار', desc: 'تشكيلة خضار طازجة', price: '9000', img: '../img/download (2).jpg' },
+                    { name: 'بيتزا مشكل', desc: 'مكس لحوم وخضار', price: '14500', img: '../img/download (2).jpg' },
+                    { name: 'بيتزا كرسي محشي', desc: 'أطراف محشية جبن بشكل نجمة', price: '15000', img: '../img/download (2).jpg' }
+                ],
+                'الصاج': [
+                    { name: 'صاج إيطالي دجاج', desc: 'صاج دجاج إيطالي مع صوص خاص', price: '7500', img: '../img/شاورما.jpg' },
+                    { name: 'صاج إيطالي لحم', desc: 'صاج لحم مع خضار وصوص', price: '8000', img: '../img/شاورما.jpg' },
+                    { name: 'صاج شاورما دجاج', desc: 'شاورما دجاج على الصاج', price: '6000', img: '../img/شاورما.jpg' },
+                    { name: 'صاج شاورما لحم', desc: 'شاورما لحم على الصاج', price: '7000', img: '../img/شاورما.jpg' }
+                ],
+                'سندويتش': [
+                    { name: 'زنگر', desc: 'صدر دجاج مقرمش مع جبن وخس وصوص', price: '6000', img: '../img/شاورما.jpg' },
+                    { name: 'كرسبي مدخن', desc: 'صدر دجاج متبّل وصوص مدخن', price: '6500', img: '../img/شاورما.jpg' },
+                    { name: 'سوبريم', desc: 'دجاج بصلصة سوبريم ومكونات مختارة', price: '6500', img: '../img/شاورما.jpg' },
+                    { name: 'سيباسي كرسبي', desc: 'كرسبي حار مع صلصة السيباسي', price: '6500', img: '../img/شاورما.jpg' },
+                    { name: 'كرانشي كرسبي', desc: 'دجاج مقرمش بجبن سايح', price: '6500', img: '../img/شاورما.jpg' },
+                    { name: 'ساندويش فلر', desc: 'صدر دجاج فلر بارد، جبن وخس وصوص', price: '6000', img: '../img/شاورما.jpg' }
+                ],
+                'تويستر': [
+                    { name: 'تويستر', desc: 'شاورما دجاج بالتتبيلة الخاصة في خبز تورتيلا', price: '6000', img: '../img/شاورما.jpg' },
+                    { name: 'تويستر مدخن', desc: 'دجاج مقرمش وصوص مدخن', price: '6500', img: '../img/شاورما.jpg' },
+                    { name: 'تويستر سبايسي', desc: 'حار ولذيذ', price: '6500', img: '../img/شاورما.jpg' },
+                    { name: 'جيزي تويستر', desc: 'محشي جبن', price: '7000', img: '../img/شاورما.jpg' }
+                ],
+                'ريزو': [
+                    { name: 'ريزو سوبر', desc: 'الترند والأكثر مبيعاً بنكهة متوازنة', price: '6000', img: '../img/🤍🤍.jpg' },
+                    { name: 'ريزو أعشاب', desc: 'أعشاب عطرية مع الدجاج', price: '6000', img: '../img/🤍🤍.jpg' },
+                    { name: 'ريزو سبايسي', desc: 'حار ولذيذ', price: '6000', img: '../img/🤍🤍.jpg' },
+                    { name: 'ريزو مدخن', desc: 'نكهة مدخنة', price: '6500', img: '../img/🤍🤍.jpg' },
+                    { name: 'ريزو جبن', desc: 'جبن لذيذ مع الرز', price: '6500', img: '../img/🤍🤍.jpg' }
+                ],
+                'اطباق جانبية': [
+                    { name: 'حلقات البصل', desc: 'مقرمشة طازجة', price: '3000', img: '../img/لعشق ☘️.jpg' },
+                    { name: 'كفكر كبابي', desc: 'كفتة مقلية مقرمشة', price: '4000', img: '../img/لعشق ☘️.jpg' },
+                    { name: 'فنگر كلاسك', desc: 'فنكر كلاسك', price: '2000', img: '../img/لعشق ☘️.jpg' },
+                    { name: 'فنگر بالصلصة', desc: 'فنكر مع صلصة', price: '3000', img: '../img/لعشق ☘️.jpg' },
+                    { name: 'كرات الدجاج', desc: 'لقيمات دجاج طرية', price: '4000', img: '../img/لعشق ☘️.jpg' },
+                    { name: 'أصابع جبن', desc: 'موزاريلا الذهبية', price: '4000', img: '../img/لعشق ☘️.jpg' },
+                    { name: 'بوب كورن', desc: 'سوبر/سبايسي/مدخن', price: '4000', img: '../img/لعشق ☘️.jpg' }
+                ],
+                'مشروبات': [
+                    { name: 'بيبسي علبة', desc: 'عبوة', price: '750', img: '../img/Coca Cola.jpg' },
+                    { name: 'مياه', desc: 'قنينة ماء', price: '250', img: '../img/Coca Cola.jpg' }
+                ]
+            };
+
+            const menuTitle = document.getElementById('menu-title');
+            const menuList = document.getElementById('menu-list');
+            const sliderItems = Array.from(document.querySelectorAll('.slider-item'));
+            const newsText = document.getElementById('news-text');
+
+            function dinar(value) {
+                return value + ' د.ع';
+            }
+
+            function showOffersOnly() {
+                document.getElementById('offers-section').style.display = '';
+                document.getElementById('menu-section').style.display = 'none';
+                menuTitle.textContent = '—';
+                menuList.innerHTML = '';
+            }
+
+            function showMenu() {
+                document.getElementById('offers-section').style.display = 'none';
+                document.getElementById('menu-section').style.display = '';
+            }
+
+            function renderCategory(category) {
+                if (category === 'العروض') {
+                    showOffersOnly();
+                    return;
+                }
+                showMenu();
+                menuTitle.textContent = category;
+                const items = categoryToItems[category] || [];
+                menuList.innerHTML = '';
+                items.forEach(function (it, idx) {
+                    const card = document.createElement('article');
+                    card.className = 'menu-card';
+                    card.style.setProperty('--delay', (idx * 0.08) + 's');
+                    card.innerHTML = `
+            <img class="menu-image" src="${it.img}" alt="${it.name}" loading="lazy">
+            <div class="menu-content">
+              <div class="menu-name">${it.name}</div>
+              <div class="menu-desc">${it.desc}</div>
+              <div class="menu-price">${dinar(it.price)}</div>
+            </div>`;
+                    menuList.appendChild(card);
+                    requestAnimationFrame(function () { card.classList.add('show'); });
+                });
+            }
+
+            // لا يوجد أنميشن أو نص متكرر في الشريط الآن
+
+            function setActive(element) {
+                sliderItems.forEach(function (el) { el.classList.remove('active'); });
+                element.classList.add('active');
+            }
+
+            sliderItems.forEach(function (el) {
+                el.addEventListener('click', function () {
+                    const category = el.getAttribute('data-category') || el.textContent.trim();
+                    setActive(el);
+                    renderCategory(category);
+                });
+            });
+
+            // عند فتح الصفحة، نجعل تبويب "العروض" نشطاً ونظهره كقسم مستقل
+            var offersTab = sliderItems.find(function (b) { return (b.getAttribute('data-category') || '') === 'العروض'; });
+            if (offersTab) {
+                setActive(offersTab);
+                renderCategory('العروض');
+            }
+            // Animate on scroll using IntersectionObserver
+            const observer = new IntersectionObserver(function (entries) {
+                entries.forEach(function (entry) {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('show');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+
+            function observeReveal() {
+                document.querySelectorAll('.menu-card, .reveal').forEach(function (el) {
+                    if (!el.classList.contains('show')) observer.observe(el);
+                });
+            }
+
+            // observe initial cards and future ones
+            observeReveal();
+            const listObserver = new MutationObserver(function () { observeReveal(); });
+            listObserver.observe(menuList, { childList: true });
+
+            // Handle CTA buttons to jump to category (offers/suggest/best)
+            document.addEventListener('click', function (e) {
+                var btn = e.target;
+                if (btn && (btn.classList.contains('offer-cta') || btn.classList.contains('suggest-cta') || btn.classList.contains('best-cta'))) {
+                    var go = btn.getAttribute('data-go');
+                    var target = Array.from(document.querySelectorAll('.slider-item')).find(function (b) {
+                        return (b.getAttribute('data-category') || '').trim() === go;
+                    });
+                    if (target) {
+                        target.click();
+                        window.scrollTo({ top: document.querySelector('.menu-container').offsetTop - 20, behavior: 'smooth' });
+                    }
+                }
+            });
+        })();
+    </script>
+
+
+
+</body>
+
+</html>
